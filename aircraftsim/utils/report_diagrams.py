@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 # import jsbsim_properties as prp
 #import jsbsim_backend.properties as prp
 #import aircraftsim.jsbsim_aircraft.properties as prp
-import jsbsim_aircraft.properties as prp
+import aircraftsim.jsbsim_aircraft.properties as prp
 
 import aircraftsim.guidance_control.navigation as navigation
 from aircraftsim.jsbsim_aircraft.simulator import FlightDynamics

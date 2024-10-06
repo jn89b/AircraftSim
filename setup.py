@@ -8,8 +8,9 @@ setup(
     version="1.0.01",
     description="A wrapper that utilizes JSBSim or Kinematics \
         to simulate aircraft dynamics",
-    package_dir={"": "aircraftsim"},
-    packages=find_packages(where="aircraftsim"),
+    #package_dir={"": "aircraftsim"},
+    #packages=find_packages(where="aircraftsim"),
+    packages=find_packages(),
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/jn89b/AircraftSim",

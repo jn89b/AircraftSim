@@ -1,4 +1,4 @@
-from aircraftsim import AircraftSim
+
 from aircraftsim.utils.data_containers import AircraftStateLimits, \
     HighLevelControlLimits, HighControlInputs, AircraftState, AircraftIC
 

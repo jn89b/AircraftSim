@@ -30,13 +30,6 @@ from .jsbsim_aircraft.simulator import (
     FlightDynamics
 )
 
-
-# from .utils import (
-#     conversions,
-#     data_containers,
-#     report_diagrams
-# )
-
 from .utils.conversions import (
     mps_to_ktas,
     meters_to_feet,
