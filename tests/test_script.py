@@ -1,5 +1,5 @@
 import numpy as np
-from aircraftsim.SimInterface import AircraftSim
+from aircraftsim.sim_interface import AircraftSim
 from aircraftsim.utils.data_containers import AircraftStateLimits, \
     HighLevelControlLimits, HighControlInputs, AircraftState, AircraftIC
 
