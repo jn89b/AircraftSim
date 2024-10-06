@@ -84,8 +84,11 @@ class FlightDynamics:
                  return_metric_units: bool = True,
                  debug_level: int = 0):
         #self.fdm = jsbsim.FGFDMExec(root_dir=self.ROOT_DIR)
-        self.fdm = jsbsim.FGFDMExec(None) # will need to map this to root 
-        self.set_root_dir()
+        self.dir = self.set_root_dir()
+        self.dir = os.path.join(self.dir, 'aircraft')
+        print("directory", self.dir)
+        self.fdm = jsbsim.FGFDMExec(root_dir=self.dir) # will need to map this to root 
+        # self.set_root_dir()
         self.fdm.set_debug_level(debug_level)
         self.sim_frequency_hz = sim_frequency_hz
         self.sim_dt = 1.0 / sim_frequency_hz
@@ -103,16 +106,15 @@ class FlightDynamics:
     def __setitem__(self, prop: Union[prp.BoundedProperty, prp.Property], value) -> None:
         self.fdm[prop.name] = value
 
-    def set_root_dir(self) -> None:
+    def set_root_dir(self) -> str:
         #get engine path
         
         # get current root dir
         curr_dir = os.path.abspath(os.path.dirname(__file__))
-        curr_dir = os.path.join(curr_dir, 'aircraft')
-        self.fdm.set_root_dir(curr_dir)
-        # set root dir
-        root_dir = self.fdm.get_root_dir()
-        print("curr_dir", root_dir)
+        #curr_dir = os.path.join(curr_dir, 'aircraft')
+
+        #print("curr_dir", curr_dir)
+        return curr_dir
         
         
     def load_model(self, model_name: str) -> None:
