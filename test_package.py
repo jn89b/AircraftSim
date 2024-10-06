@@ -1,13 +1,18 @@
-import numpy as np
-from aircraftsim.sim_interface import AircraftSim
+from aircraftsim import AircraftSim
 from aircraftsim.utils.data_containers import AircraftStateLimits, \
     HighLevelControlLimits, HighControlInputs, AircraftState, AircraftIC
 
-from aircraftsim.utils.report_diagrams import ReportGraphs,SimResults, DataVisualizer
+# from data_containers import AircraftStateLimits, \
+#     HighLevelControlLimits, HighControlInputs, AircraftState, AircraftIC
 
+# from aircraftsim.utils.report_diagrams import ReportGraphs,\
+#     SimResults, DataVisualizer
+
+import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use("TkAgg")
+
 
 state_limits = AircraftStateLimits(
     x_bounds=[-100,100],
@@ -39,13 +44,13 @@ sim = AircraftSim(
     sim_freq=200
 )
 
-N = 2000
-high_lvl_ctrl = HighControlInputs(
-    ctrl_idx=1,
-    alt_ref_m=50,
-    heading_ref_deg=-20,
-    vel_cmd=20,
-)
+# N = 2000
+# high_lvl_ctrl = HighControlInputs(
+#     ctrl_idx=1,
+#     alt_ref_m=50,
+#     heading_ref_deg=-20,
+#     vel_cmd=20,
+# )
 
 # for i in range(N):
 #     sim.step(high_lvl_ctrl=high_lvl_ctrl)

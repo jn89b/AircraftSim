@@ -1,12 +1,33 @@
-import numpy as np
-from aircraftsim.sim_interface import AircraftSim
-from aircraftsim.utils.data_containers import AircraftStateLimits, \
-    HighLevelControlLimits, HighControlInputs, AircraftState, AircraftIC
+from aircraftsim import (
+    X8Autopilot,
+    C172Autopilot,
+    SimInterface
+)
 
-from aircraftsim.utils.report_diagrams import ReportGraphs,SimResults, DataVisualizer
+
+from aircraftsim import (
+    FlightDynamics
+)
+
+from aircraftsim import (
+    LocalNavigation,
+    WindEstimation
+)
+
+from aircraftsim import (
+    AircraftStateLimits,
+    HighLevelControlLimits,
+    LowLevelControlLimits,
+    AircraftState,
+    AircraftIC,
+    HighControlInputs,
+    DataVisualizer
+)
+
 
 import matplotlib.pyplot as plt
 import matplotlib
+import numpy as np
 matplotlib.use("TkAgg")
 
 state_limits = AircraftStateLimits(
@@ -31,7 +52,7 @@ init_cond = AircraftIC(
     yaw=np.deg2rad(0),
     airspeed_m=20)
 
-sim = AircraftSim(
+sim = SimInterface(
     aircraft_name='x8',
     init_cond=init_cond,
     high_control_lim=hl_ctrl_limits,
@@ -47,12 +68,20 @@ high_lvl_ctrl = HighControlInputs(
     vel_cmd=20,
 )
 
-# for i in range(N):
-#     sim.step(high_lvl_ctrl=high_lvl_ctrl)
 
-# report = sim.report
-# data_vis = DataVisualizer(report)
-# fig, ax = data_vis.plot_3d_trajectory()
-# fig1, ax1 = data_vis.plot_attitudes()
-# #save figure
-# plt.show()
+high_lvl_ctrl = HighControlInputs(
+    ctrl_idx=1,
+    alt_ref_m=50,
+    heading_ref_deg=-20,
+    vel_cmd=20,
+)
+
+for i in range(N):
+    sim.step(high_lvl_ctrl=high_lvl_ctrl)
+
+report = sim.report
+data_vis = DataVisualizer(report)
+fig, ax = data_vis.plot_3d_trajectory()
+fig1, ax1 = data_vis.plot_attitudes()
+#save figure
+plt.show()

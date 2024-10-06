@@ -1,6 +1,7 @@
 import math
 #import jsbsim_backend.properties as prp
-import src.jsbsim_aircraft.properties as prp
+import jsbsim_aircraft.properties as prp
+#import aircraftsim.jsbsim_aircraft.properties as prp
 # import src.jsbsim_properties as prp
 import statistics
 

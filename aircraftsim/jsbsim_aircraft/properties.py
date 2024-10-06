@@ -2,7 +2,8 @@ import math
 import collections
 # from src.jsbsim_utils import AttributeFormatter
 #from jsbsim_backend.utils import AttributeFormatter
-from src.utils.utils import AttributeFormatter
+#from aircraftsim.utils.utils import AttributeFormatter
+from aircraftsim.utils.utils import AttributeFormatter
 """
 ATTRIBUTION: Based on https://github.com/Gor-Ren/gym-jsbsim/blob/master/gym_jsbsim/properties.py by Gordon Rennie, defines parameters
 and bounds properties to ensure out-of-bound values are not assigned to JSBSim properties

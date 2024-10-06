@@ -10,7 +10,7 @@ body frame to inertial frame is yaw,pitch,roll rotation
 import numpy as np
 import math as m
 import casadi as ca
-import controls.rotation_utils as rot
+#import controls.rotation_utils as rot
 #import rotation_utils as rot
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon

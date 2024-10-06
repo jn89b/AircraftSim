@@ -1,7 +1,9 @@
 from typing import List
 from dataclasses import dataclass
 #import numpy as np
-from src.utils.conversions import mps_to_ktas, meters_to_feet
+#from aircraftsim.utils.conversions import mps_to_ktas, meters_to_feet
+from ..utils.conversions import mps_to_ktas, meters_to_feet
+
 #from src.conversions import mps_to_ktas, meters_to_feet
 @dataclass
 class AircraftStateLimits():

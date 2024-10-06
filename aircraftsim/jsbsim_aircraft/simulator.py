@@ -3,10 +3,10 @@ import jsbsim
 import os
 import time
 from typing import Dict, Union
-from src.jsbsim_aircraft import properties as prp
-from src.utils.conversions import feet_to_meters, meters_to_feet, knots_to_mps, mps_to_knots
-from src.jsbsim_aircraft.aircraft import Aircraft, x8
-from src.utils.data_containers import AircraftState
+from aircraftsim.jsbsim_aircraft import properties as prp
+from aircraftsim.utils.conversions import feet_to_meters, meters_to_feet, knots_to_mps, mps_to_knots
+from aircraftsim.jsbsim_aircraft.aircraft import Aircraft, x8
+from aircraftsim.utils.data_containers import AircraftState
 import math
 
 """Initially based upon https://github.com/Gor-Ren/gym-jsbsim/blob/master/gym_jsbsim/simulation.py by Gordon Rennie"""

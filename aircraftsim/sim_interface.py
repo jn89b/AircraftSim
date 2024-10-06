@@ -18,6 +18,7 @@ from aircraftsim.guidance_control.navigation import WindEstimation
 from aircraftsim.utils.conversions import mps_to_ktas, meters_to_feet, local_to_global_position
 from aircraftsim.utils.report_diagrams import ReportGraphs,SimResults
 
+
 class AircraftSim():
     fidelity_list = ['JSBSIM', 'KINEMATICS']
     integration_list = ['EULER', 'RK4']

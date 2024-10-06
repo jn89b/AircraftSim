@@ -2,10 +2,10 @@ import math
 from scipy import interpolate
 from simple_pid import PID
 #import jsbsim_properties as prp
-import src.jsbsim_aircraft.properties as prp
+import aircraftsim.jsbsim_aircraft.properties as prp
 # from src.jsbsim_simulator import Simulation
-from src.jsbsim_aircraft.simulator import FlightDynamics
-from src.guidance_control.navigation import LocalNavigation
+from aircraftsim.jsbsim_aircraft.simulator import FlightDynamics
+from aircraftsim.guidance_control.navigation import LocalNavigation
 #from navigation import LocalNavigation
 # import control
 
