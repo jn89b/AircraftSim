@@ -267,6 +267,18 @@ class FlightDynamics:
         # return position
         return [lon_meters, lat_meters, alt_meters]
 
+    def get_rates(self) -> list:
+        """
+        Get the rates of the aircraft
+
+        :return: rates [p, q, r]
+        """
+        p = self[prp.p_radps]
+        q = self[prp.q_radps]
+        r = self[prp.r_radps]
+        rates = [p, q, r]
+        return rates
+
     def get_local_orientation(self) -> list:
         """
         Get the orientation of the vehicle
@@ -278,7 +290,7 @@ class FlightDynamics:
         # yaw = self[prp.heading_deg] * (math.pi / 180)
         yaw = self[prp.heading_rad]
         #wrap yaw to -pi to pi
-        yaw = (yaw + math.pi) % (2 * math.pi) - math.pi
+        #yaw = (yaw + math.pi) % (2 * math.pi) - math.pi
         # yaw = self.fdm.get_property_value("attitude/heading-true-rad")
         #self[prp.heading_rad]
         orientation = [roll, pitch, yaw]
@@ -295,6 +307,8 @@ class FlightDynamics:
         # v_ms = feet_to_meters(self[prp.v_fps])
         # w_ms = feet_to_meters(self[prp.w_fps])
         # mag_airspeed = math.sqrt(u_ms**2 + v_ms**2 + w_ms**2)
+        #wrap the yaw to -pi to pi
+        orientation[2] = (orientation[2] + math.pi) % (2 * math.pi) - math.pi
         
         states = AircraftState(
             x = position[0],

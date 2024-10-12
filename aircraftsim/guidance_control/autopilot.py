@@ -222,10 +222,10 @@ class X8Autopilot:
         heading_controller = PID(kp, ki, 0.0)
         output = heading_controller(error)
         # Prevent over-bank +/- 30 degrees
-        if output < - 30 * (math.pi / 180):
-            output = - 30 * (math.pi / 180)
-        if output > 30 * (math.pi / 180):
-            output = 30 * (math.pi / 180)
+        if output < - 45 * (math.pi / 180):
+            output = - 45 * (math.pi / 180)
+        if output > 45 * (math.pi / 180):
+            output = 45 * (math.pi / 180)
         self.roll_hold(output)
 
     def airspeed_hold_w_throttle(self, airspeed_comm: float) -> None:
@@ -297,6 +297,17 @@ class X8Autopilot:
                 self.heading_hold(bearing)
                 self.altitude_hold(target_alt)
 
+    def track_to_target_local(self, x:float, y:float, z:float) -> bool:
+        """
+        Homes towards a 3D (x, y, z) point in space and uses altitude_hold to maintain an altitude
+
+        :param x: x-coordinate of target relative to current position [m]
+        :param y: y-coordinate of target relative to current position [m]
+        :param z: demanded altitude for this path segment [feet]
+        :return: flag==True if the simulation has reached a target in space
+        """
+        
+
     def track_to_target(self, target_northing: float, target_easting: float, target_alt: float) -> bool:
         """
         Maintains a track from the point the simulation started at to the target point
@@ -335,7 +346,7 @@ class X8Autopilot:
             kd = 0.0
             closure_controller = PID(kp, ki, kd)
             heading = closure_controller(-error) + bearing
-            if distance < 200:
+            if distance < 5.0:
                 self.flag = True
                 self.nav = None
                 return self.flag

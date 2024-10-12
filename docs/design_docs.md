@@ -31,3 +31,9 @@ User creates the aircraft sim
 - X = North
 - Y = East
 - Z = Down
+
+
+## Heading Control Notes
+- The heading control orientation is as follows:
+    - 0 degrees is north in the y direction
+    - 90 degrees is east in the x direction

@@ -27,7 +27,7 @@ setup(
         "casadi>=3.6.7",
         "JSBSim>=1.2.1",
         "matplotlib>=3.9.2",
-        "numpy>=2.0.0",
+        "numpy<2.0.0",
         "scipy>=1.14.1",
         "setuptools>=59.6.0",
         "Shapely>=2.0.6",

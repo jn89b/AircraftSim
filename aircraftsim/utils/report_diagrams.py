@@ -190,8 +190,8 @@ class SimResults():
         self.long_m.append(self.sim.get_local_position()[1])
         self.alt.append(self.sim.get_local_position()[2])
         
-        self.pitch_dg.append(self.sim.get_local_orientation()[0] * (180 / math.pi))
-        self.roll_dg.append(self.sim.get_local_orientation()[1] * (180 / math.pi))
+        self.roll_dg.append(self.sim.get_local_orientation()[0] * (180 / math.pi))
+        self.pitch_dg.append(self.sim.get_local_orientation()[1] * (180 / math.pi))
         self.yaw_dg.append(self.sim.get_local_orientation()[2] * (180 / math.pi))
         
         self.p.append(self.sim[prp.p_radps])
@@ -230,9 +230,14 @@ class DataVisualizer():
         # get the indices of the time
         ax.plot(self.report.x, self.report.y, self.report.z, label='trajectory',
                 linewidth=2, color=color)        
+        #plot start and end points
+        ax.scatter(self.report.x[0], self.report.y[0], self.report.z[0], color='green', label='start')
+        ax.scatter(self.report.x[-1], self.report.y[-1], self.report.z[-1], color='red', label='end')
         ax.set_xlabel('x [m]')
         ax.set_ylabel('y [m]')
         ax.set_zlabel('z [m]')
+        ax.legend()
+        
         return fig, ax
     
     def plot_attitudes(self, start_time:float=None,
