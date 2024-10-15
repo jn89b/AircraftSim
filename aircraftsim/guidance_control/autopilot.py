@@ -1,12 +1,12 @@
 import math
 from scipy import interpolate
 from simple_pid import PID
-#import jsbsim_properties as prp
+# import jsbsim_properties as prp
 import aircraftsim.jsbsim_aircraft.properties as prp
 # from src.jsbsim_simulator import Simulation
 from aircraftsim.jsbsim_aircraft.simulator import FlightDynamics
 from aircraftsim.guidance_control.navigation import LocalNavigation
-#from navigation import LocalNavigation
+# from navigation import LocalNavigation
 # import control
 
 
@@ -14,8 +14,8 @@ from aircraftsim.guidance_control.navigation import LocalNavigation
 # def __init__(self):
 #     super().__init__()
 class C172Autopilot:
-    def __init__(self, sim:FlightDynamics):
-        self.sim:FlightDynamics = sim
+    def __init__(self, sim: FlightDynamics):
+        self.sim: FlightDynamics = sim
 
     def wing_leveler(self):
         error = self.sim[prp.roll_rad]
@@ -134,8 +134,9 @@ class X8Autopilot:
 
 
     """
-    def __init__(self, sim:FlightDynamics):
-        self.sim:FlightDynamics = sim
+
+    def __init__(self, sim: FlightDynamics):
+        self.sim: FlightDynamics = sim
         self.nav = None
         # self.orbit_nav = None
         self.track_bearing = 0
@@ -146,9 +147,9 @@ class X8Autopilot:
         self.track_id = -1
         self.state = 0
 
-    def test_controls(self, elevator:float=0, 
-                      aileron:float=0, 
-                      tla:float=0) -> None:
+    def test_controls(self, elevator: float = 0,
+                      aileron: float = 0,
+                      tla: float = 0) -> None:
         """
         Directly control the aircraft using control surfaces for the purpose of testing the model
 
@@ -222,10 +223,10 @@ class X8Autopilot:
         heading_controller = PID(kp, ki, 0.0)
         output = heading_controller(error)
         # Prevent over-bank +/- 30 degrees
-        if output < - 45 * (math.pi / 180):
-            output = - 45 * (math.pi / 180)
-        if output > 45 * (math.pi / 180):
-            output = 45 * (math.pi / 180)
+        if output < - 30 * (math.pi / 180):
+            output = - 30 * (math.pi / 180)
+        if output > 30 * (math.pi / 180):
+            output = 30 * (math.pi / 180)
         self.roll_hold(output)
 
     def airspeed_hold_w_throttle(self, airspeed_comm: float) -> None:
@@ -236,7 +237,8 @@ class X8Autopilot:
         :return: None
         """
         # Appears fine with simple proportional controller, light airspeed instability at high speed (100kts)
-        error = airspeed_comm - (self.sim[prp.airspeed] * 0.5925)  # set airspeed in KTAS'
+        # set airspeed in KTAS'
+        error = airspeed_comm - (self.sim[prp.airspeed] * 0.5925)
         kp = 1.0
         ki = 0.035
         airspeed_controller = PID(kp, ki, 0.0)
@@ -297,7 +299,7 @@ class X8Autopilot:
                 self.heading_hold(bearing)
                 self.altitude_hold(target_alt)
 
-    def track_to_target_local(self, x:float, y:float, z:float) -> bool:
+    def track_to_target_local(self, x: float, y: float, z: float) -> bool:
         """
         Homes towards a 3D (x, y, z) point in space and uses altitude_hold to maintain an altitude
 
@@ -306,7 +308,6 @@ class X8Autopilot:
         :param z: demanded altitude for this path segment [feet]
         :return: flag==True if the simulation has reached a target in space
         """
-        
 
     def track_to_target(self, target_northing: float, target_easting: float, target_alt: float) -> bool:
         """
@@ -377,7 +378,8 @@ class X8Autopilot:
             point_b = profile[self.track_id + 1]
             # initialize target and track
             self.nav = LocalNavigation(self.sim)
-            self.nav.set_local_target(point_b[0] - point_a[0], point_b[1] - point_a[1])
+            self.nav.set_local_target(
+                point_b[0] - point_a[0], point_b[1] - point_a[1])
             self.track_bearing = self.nav.bearing() * 180.0 / math.pi
             if self.track_bearing < 0:
                 self.track_bearing = self.track_bearing + 360.0
@@ -395,7 +397,8 @@ class X8Autopilot:
             distance_to_go = self.nav.distance_to_go(distance, off_tk_angle)
             if distance_to_go > 3000:
                 distance_to_go = 3000
-            heading = (8 * 0.00033 * distance_to_go * off_tk_angle) + self.track_bearing
+            heading = (8 * 0.00033 * distance_to_go *
+                       off_tk_angle) + self.track_bearing
 
             # radius = (self.sim[prp.airspeed] * 0.5925 / (20.0 * math.pi)) * 1852  # rate 1 radius
             radius = 300
@@ -437,13 +440,15 @@ class X8Autopilot:
             point_c = profile[self.track_id + 2]
             self.nav = LocalNavigation(self.sim)
             # Initialize track outbound from b
-            self.nav.set_local_target(point_c[0] - point_b[0], point_c[1] - point_b[1])
+            self.nav.set_local_target(
+                point_c[0] - point_b[0], point_c[1] - point_b[1])
             self.track_bearing_out = self.nav.bearing() * 180.0 / math.pi
             if self.track_bearing_out < 0:
                 self.track_bearing_out = self.track_bearing_out + 360.0
             # Initialize track inbound to b
             self.nav.local_target_set = False
-            self.nav.set_local_target(point_b[0] - point_a[0], point_b[1] - point_a[1])
+            self.nav.set_local_target(
+                point_b[0] - point_a[0], point_b[1] - point_a[1])
             self.track_bearing_in = self.nav.bearing() * 180.0 / math.pi
             if self.track_bearing_in < 0:
                 self.track_bearing_in = self.track_bearing_in + 360.0
@@ -460,7 +465,8 @@ class X8Autopilot:
                 filet_angle = filet_angle + 360
             if self.state == 0:
                 # Calculate h_plane to transition from straight line state to curved filet state
-                q = self.nav.unit_dir_vector(profile[self.track_id], profile[self.track_id + 1])
+                q = self.nav.unit_dir_vector(
+                    profile[self.track_id], profile[self.track_id + 1])
                 w = profile[self.track_id + 1]
                 try:
                     z_point = (w[0] - ((radius / math.tan(filet_angle / 2 * (math.pi / 180.0))) * q[0]),
@@ -481,10 +487,12 @@ class X8Autopilot:
                     if off_tk_angle > 180:
                         off_tk_angle = off_tk_angle - 360.0
                     # scale response with distance from target
-                    distance_to_go = self.nav.distance_to_go(distance, off_tk_angle)
+                    distance_to_go = self.nav.distance_to_go(
+                        distance, off_tk_angle)
                     if distance_to_go > 3000:
                         distance_to_go = 3000
-                    heading = (8 * 0.00033 * distance_to_go * off_tk_angle) + self.track_bearing_in
+                    heading = (8 * 0.00033 * distance_to_go *
+                               off_tk_angle) + self.track_bearing_in
                 except ZeroDivisionError:
                     heading = self.track_bearing_in  # TODO: find a way to deal with straight lines
                     print("You have straight lines don't do this!")
@@ -493,8 +501,10 @@ class X8Autopilot:
 
             if self.state == 1:
                 # filet location
-                q0 = self.nav.unit_dir_vector(profile[self.track_id], profile[self.track_id + 1])
-                q1 = self.nav.unit_dir_vector(profile[self.track_id + 1], profile[self.track_id + 2])
+                q0 = self.nav.unit_dir_vector(
+                    profile[self.track_id], profile[self.track_id + 1])
+                q1 = self.nav.unit_dir_vector(
+                    profile[self.track_id + 1], profile[self.track_id + 2])
                 q_grad = self.nav.unit_dir_vector(q1, q0)
                 w = profile[self.track_id + 1]
                 # center point of arc (mirrored from radius and apex of turn)
@@ -502,7 +512,8 @@ class X8Autopilot:
                                 w[1] - ((radius / math.sin(filet_angle / 2 * (math.pi / 180.0))) * q_grad[1]))
                 z_point = (w[0] + ((radius / math.tan(filet_angle / 2 * (math.pi / 180.0))) * q1[0]),
                            w[1] + ((radius / math.tan(filet_angle / 2 * (math.pi / 180.0))) * q1[1]))
-                turning_direction = math.copysign(1, (q0[0] * q1[1]) - (q0[1] * q1[0]))
+                turning_direction = math.copysign(
+                    1, (q0[0] * q1[1]) - (q0[1] * q1[0]))
                 cur = self.nav.get_local_pos()
                 h_point = (cur[0] - z_point[0], cur[1] - z_point[1])
                 h_val = (h_point[0] * q1[0]) + (h_point[1] * q1[1])
@@ -519,7 +530,8 @@ class X8Autopilot:
                 circle_angle = math.atan2(circ_x, circ_y)
                 if circle_angle < 0:
                     circle_angle = circle_angle + (2 * math.pi)
-                tangent_track = circle_angle + (turning_direction * (math.pi / 2))
+                tangent_track = circle_angle + \
+                    (turning_direction * (math.pi / 2))
                 if tangent_track < 0:
                     tangent_track = tangent_track + (2 * math.pi)
                 if tangent_track > 2 * math.pi:
@@ -527,7 +539,8 @@ class X8Autopilot:
                 tangent_track = tangent_track * (180.0 / math.pi)
                 error = (distance_from_center - radius) / radius
                 k_orbit = 4.0
-                heading = tangent_track + (math.atan(k_orbit * error) * (180.0 / math.pi))
+                heading = tangent_track + \
+                    (math.atan(k_orbit * error) * (180.0 / math.pi))
                 self.heading_hold(heading)
                 self.altitude_hold(altitude_comm=w[2])
 
@@ -589,21 +602,3 @@ class X8Autopilot:
 #                                                states=state,
 #                                                dt=self.dt,
 #                                                name='x8StateSpace')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

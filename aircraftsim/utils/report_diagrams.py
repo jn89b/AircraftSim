@@ -1,19 +1,20 @@
 import matplotlib
 # matplotlib.rcParams['text.usetex'] = True
-from typing import List,Tuple
+from typing import List, Tuple
 # rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
-## for Palatino and other serif fonts use:
+# for Palatino and other serif fonts use:
 # rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
 # rc('text', usetex=True)
 import matplotlib.pyplot as plt
 # import jsbsim_properties as prp
-#import jsbsim_backend.properties as prp
-#import aircraftsim.jsbsim_aircraft.properties as prp
+# import jsbsim_backend.properties as prp
+# import aircraftsim.jsbsim_aircraft.properties as prp
 import aircraftsim.jsbsim_aircraft.properties as prp
 
 import aircraftsim.guidance_control.navigation as navigation
 from aircraftsim.jsbsim_aircraft.simulator import FlightDynamics
 from aircraftsim.utils.data_containers import AircraftState
+from aircraftsim.utils.conversions import feet_to_meters
 # import guidance_control.navigation as navigation
 import math
 import numpy as np
@@ -59,7 +60,8 @@ class ReportGraphs:
         self.alt.append(self.sim.get_local_position()[2])
 
     def get_attitude_data(self):
-        self.pitch.append(self.sim.get_local_orientation()[0] * (180 / math.pi))
+        self.pitch.append(self.sim.get_local_orientation()
+                          [0] * (180 / math.pi))
         self.roll.append(self.sim.get_local_orientation()[1] * (180 / math.pi))
         self.yaw.append(self.sim.get_local_orientation()[2] * (180 / math.pi))
 
@@ -72,7 +74,8 @@ class ReportGraphs:
         self.airspeed.append(self.sim[prp.airspeed] * 0.5925)
 
     def get_control_command(self):
-        self.aileron_combined.append(self.sim[prp.aileron_combined_rad] * (180.0 / math.pi))
+        self.aileron_combined.append(
+            self.sim[prp.aileron_combined_rad] * (180.0 / math.pi))
         self.elevator.append(self.sim[prp.elevator] * (180.0 / math.pi))
 
     def get_graph_info(self):
@@ -91,7 +94,8 @@ class ReportGraphs:
         plt.grid(True)
         points, = ax.plot([i[0] for i in desired_points], [i[1] for i in desired_points], marker='^',
                           color='#FF7F11', linestyle='None')
-        line, = ax.plot(self.lat_m, self.long_m, linestyle='--', color='#0077B6')
+        line, = ax.plot(self.lat_m, self.long_m,
+                        linestyle='--', color='#0077B6')
         line.set_label(r'track made good')
         points.set_label(r'commanded fly-by waypoints')
         ax.legend()
@@ -110,15 +114,16 @@ class ReportGraphs:
         ax1.set_xlabel(r'time[s]')
         ax1.set_ylabel(r'q')
         ax3 = ax1.twinx()
-        ax3.plot(self.time[start:stop], self.elevator[start:stop], linestyle='-', color=blue)
+        ax3.plot(self.time[start:stop],
+                 self.elevator[start:stop], linestyle='-', color=blue)
 
         ax2 = plt.subplot(212)
         # ax2.plot(self.time[start:stop], self.p[start:stop], linestyle='--', color=orange)
         ax2.set_title(r'\textbf{Pitch Response}')
         ax2.set_xlabel(r'time [s]')
         ax4 = ax2.twinx()
-        ax4.plot(self.time[start:stop], self.aileron_combined[start:stop], linestyle='-', color=blue)
-
+        ax4.plot(self.time[start:stop],
+                 self.aileron_combined[start:stop], linestyle='-', color=blue)
 
         # ax5 = plt.subplot(212)
         # plt.plot(self.time[start:stop], self.yaw[start:stop], linestyle='--', color=orange)
@@ -146,121 +151,150 @@ class ReportGraphs:
         ax.set_box_aspect((np.ptp(xline), np.ptp(yline), 11*np.ptp(zline)))
         plt.savefig('box.eps')
         plt.show()
-        
+
+
 class SimResults():
     """
     Collects simulation results for plotting
     """
+
     def __init__(self,
-                 sim:FlightDynamics) -> None:
-        self.sim:FlightDynamics = sim
-        self.time:List[float] = []
-        self.lat_m:List[float] = []
-        self.long_m:List[float] = []
-        self.alt:List[float] = []
-        
-        self.yaw_dg:List[float] = []
-        self.pitch_dg:List[float] = []
-        self.roll_dg:List[float] = []
-        
-        self.aileron_cmd:List[float] = []
-        self.elevator_cmd:List[float] = []
-        self.throttle_cmd:List[float] = []
-        self.rudder_cmd:List[float] = []
-        
-        self.aileron_combined:List[float] = []
-        self.elevator:List[float] = []
-        self.throttle:List[float] = []
-        
-        self.p:List[float] = []
-        self.q:List[float] = []
-        self.r:List[float] = []
-        
-        self.airspeed:List[float] = []
-        self.vs:List[float] = []
-        self.airspeed_ref:List[float] = []
-        
-        self.x:List[float] = []
-        self.y:List[float] = []
-        self.z:List[float] = []
-    
-    def collect_data(self, aircraft_state:AircraftState)->None:
+                 sim: FlightDynamics) -> None:
+        self.sim: FlightDynamics = sim
+        self.time: List[float] = []
+        self.lat_m: List[float] = []
+        self.long_m: List[float] = []
+        self.alt: List[float] = []
+
+        self.yaw_dg: List[float] = []
+        self.pitch_dg: List[float] = []
+        self.roll_dg: List[float] = []
+
+        self.aileron_cmd: List[float] = []
+        self.elevator_cmd: List[float] = []
+        self.throttle_cmd: List[float] = []
+        self.rudder_cmd: List[float] = []
+
+        self.aileron_combined: List[float] = []
+        self.elevator: List[float] = []
+        self.throttle: List[float] = []
+
+        self.p: List[float] = []
+        self.q: List[float] = []
+        self.r: List[float] = []
+
+        self.airspeed: List[float] = []
+        self.vs: List[float] = []
+        self.airspeed_ref: List[float] = []
+
+        self.x: List[float] = []
+        self.y: List[float] = []
+        self.z: List[float] = []
+
+    def collect_data(self, aircraft_state: AircraftState) -> None:
         self.time.append(self.sim.get_time())
         self.lat_m.append(self.sim.get_local_position()[0])
         self.long_m.append(self.sim.get_local_position()[1])
         self.alt.append(self.sim.get_local_position()[2])
-        
-        self.roll_dg.append(self.sim.get_local_orientation()[0] * (180 / math.pi))
-        self.pitch_dg.append(self.sim.get_local_orientation()[1] * (180 / math.pi))
-        self.yaw_dg.append(self.sim.get_local_orientation()[2] * (180 / math.pi))
-        
+
+        self.roll_dg.append(self.sim.get_local_orientation()[
+                            0] * (180 / math.pi))
+        self.pitch_dg.append(self.sim.get_local_orientation()[
+                             1] * (180 / math.pi))
+        self.yaw_dg.append(self.sim.get_local_orientation()
+                           [2] * (180 / math.pi))
+
         self.p.append(self.sim[prp.p_radps])
         self.q.append(self.sim[prp.q_radps])
         self.r.append(self.sim[prp.r_radps])
-        
-        self.airspeed.append(self.sim[prp.airspeed] * 0.5925)
-        
-        self.aileron_combined.append(self.sim[prp.aileron_combined_rad] * (180.0 / math.pi))
+
+        self.airspeed.append(feet_to_meters(self.sim[prp.airspeed]))
+
+        self.aileron_combined.append(
+            self.sim[prp.aileron_combined_rad] * (180.0 / math.pi))
         self.elevator.append(self.sim[prp.elevator] * (180.0 / math.pi))
-        
+
         self.x.append(aircraft_state.x)
         self.y.append(aircraft_state.y)
         self.z.append(aircraft_state.z)
-        
+
         return None
-    
+
+
 class DataVisualizer():
-    def __init__(self, sim_results:SimResults) -> None:
-        self.report:SimResults = sim_results
+    def __init__(self, sim_results: SimResults) -> None:
+        self.report: SimResults = sim_results
         # self.report_graphs:ReportGraphs = ReportGraphs(sim)
-        
-    def plot_3d_trajectory(self, start_time:float=None,
-                           end_time:float=None,
-                           color:str='blue') -> Tuple[plt.Figure, plt.Axes]:
-        
+
+    def plot_3d_trajectory(self, start_time: float = None,
+                           end_time: float = None,
+                           color: str = 'blue') -> Tuple[plt.Figure, plt.Axes]:
+
         if start_time is None:
             start_time = 0
         if end_time is None:
             end_time = self.report.time[-1]
-            
+
         # fig, ax = plt.subplots()
         # ax = fig.add_subplot(111, projection='3d')
         fig, ax = plt.subplots(subplot_kw={'projection': '3d'})
-        
+
         # get the indices of the time
         ax.plot(self.report.x, self.report.y, self.report.z, label='trajectory',
-                linewidth=2, color=color)        
-        #plot start and end points
-        ax.scatter(self.report.x[0], self.report.y[0], self.report.z[0], color='green', label='start')
-        ax.scatter(self.report.x[-1], self.report.y[-1], self.report.z[-1], color='red', label='end')
+                linewidth=2, color=color)
+        # plot start and end points
+        ax.scatter(self.report.x[0], self.report.y[0],
+                   self.report.z[0], color='green', label='start')
+        ax.scatter(self.report.x[-1], self.report.y[-1],
+                   self.report.z[-1], color='red', label='end')
         ax.set_xlabel('x [m]')
         ax.set_ylabel('y [m]')
         ax.set_zlabel('z [m]')
         ax.legend()
-        
+
         return fig, ax
-    
-    def plot_attitudes(self, start_time:float=None,
-                       end_time:float=None) -> Tuple[plt.Figure, plt.Axes]:
+
+    def plot_attitudes(self, start_time: float = None,
+                       end_time: float = None) -> Tuple[plt.Figure, plt.Axes]:
         if start_time is None:
             start_time = 0
         if end_time is None:
             end_time = self.report.time[-1]
-        
-        labels = ['roll', 'pitch', 'yaw'] 
-           
-        #create subplots for roll, pitch, yaw
-        fig, ax = plt.subplots(3,1, figsize=(10,10))
-        ax[0].plot(self.report.time, self.report.roll_dg, label='roll', color='blue')
-        ax[1].plot(self.report.time, self.report.pitch_dg, label='pitch', color='blue')
-        ax[2].plot(self.report.time, self.report.yaw_dg, label='yaw', color='blue')
-        
-        #plot the reference values
-        #TODO: Add reference values
-        
+
+        labels = ['roll', 'pitch', 'yaw']
+
+        # create subplots for roll, pitch, yaw
+        fig, ax = plt.subplots(3, 1, figsize=(10, 10))
+        ax[0].plot(self.report.time, self.report.roll_dg,
+                   label='roll', color='blue')
+        ax[1].plot(self.report.time, self.report.pitch_dg,
+                   label='pitch', color='blue')
+        ax[2].plot(self.report.time, self.report.yaw_dg,
+                   label='yaw', color='blue')
+
+        # plot the reference values
+        # TODO: Add reference values
+
         for a in ax:
             a.set_xlabel('Time [s]')
             a.set_ylabel('Angle [deg]')
             a.legend()
-            
+
+        return fig, ax
+
+    def plot_airspeed(self, start_time: float = None,
+                      end_time: float = None) -> Tuple[plt.Figure, plt.Axes]:
+        if start_time is None:
+            start_time = 0
+
+        if end_time is None:
+            end_time = self.report.time[-1]
+
+        fig, ax = plt.subplots()
+        ax.plot(self.report.time, self.report.airspeed,
+                label='airspeed', color='blue')
+        ax.set_xlabel('Time [s]')
+        ax.set_ylabel('Airspeed [kts]')
+        ax.legend()
+
         return fig, ax

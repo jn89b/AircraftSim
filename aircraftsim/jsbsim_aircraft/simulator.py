@@ -1,5 +1,5 @@
 import jsbsim
-#import airsim
+# import airsim
 import os
 import time
 from typing import Dict, Union
@@ -75,19 +75,20 @@ class FlightDynamics:
     """
 
     encoding = 'utf-8'
-    #ROOT_DIR = os.path.abspath(r"c:\Users\quessy\Dev\jsbsim")
-    
+    # ROOT_DIR = os.path.abspath(r"c:\Users\quessy\Dev\jsbsim")
+
     def __init__(self,
                  sim_frequency_hz: float = 100.0,
                  aircraft: Aircraft = x8,
-                 init_conditions:Dict = None,
+                 init_conditions: Dict = None,
                  return_metric_units: bool = True,
                  debug_level: int = 0):
-        #self.fdm = jsbsim.FGFDMExec(root_dir=self.ROOT_DIR)
+        # self.fdm = jsbsim.FGFDMExec(root_dir=self.ROOT_DIR)
         self.dir = self.set_root_dir()
         self.dir = os.path.join(self.dir, 'aircraft')
         print("directory", self.dir)
-        self.fdm = jsbsim.FGFDMExec(root_dir=self.dir) # will need to map this to root 
+        # will need to map this to root
+        self.fdm = jsbsim.FGFDMExec(root_dir=self.dir)
         # self.set_root_dir()
         self.fdm.set_debug_level(debug_level)
         self.sim_frequency_hz = sim_frequency_hz
@@ -95,7 +96,8 @@ class FlightDynamics:
         self.aircraft = aircraft
         self.init_conditions = init_conditions
         self.return_metric_units = return_metric_units
-        self.initialise(self.sim_dt, self.aircraft.jsbsim_id, self.init_conditions)
+        self.initialise(self.sim_dt, self.aircraft.jsbsim_id,
+                        self.init_conditions)
         self.fdm.disable_output()
         self.wall_clock_dt = None
         # self.client = self.airsim_connect()
@@ -107,16 +109,15 @@ class FlightDynamics:
         self.fdm[prop.name] = value
 
     def set_root_dir(self) -> str:
-        #get engine path
-        
+        # get engine path
+
         # get current root dir
         curr_dir = os.path.abspath(os.path.dirname(__file__))
-        #curr_dir = os.path.join(curr_dir, 'aircraft')
+        # curr_dir = os.path.join(curr_dir, 'aircraft')
 
-        #print("curr_dir", curr_dir)
+        # print("curr_dir", curr_dir)
         return curr_dir
-        
-        
+
     def load_model(self, model_name: str) -> None:
         """
         Load a JSBSim xml formatted aircraft model into the JSBSim flight dynamic model
@@ -124,11 +125,12 @@ class FlightDynamics:
         :param model_name: name of aircraft model loaded into JSBSim
         :return: None
         """
-        
+
         load_success = self.fdm.load_model(model_name)
 
         if not load_success:
-            raise RuntimeError('JSBSim could not find specified model name: ' + model_name)
+            raise RuntimeError(
+                'JSBSim could not find specified model name: ' + model_name)
 
     def get_aircraft(self) -> Aircraft:
         """
@@ -168,15 +170,16 @@ class FlightDynamics:
         # self.fdm.load_ic(ic_path, useStoredPath=False)
         for k, v in init_conditions.items():
             self.fdm[k] = v
-        
-        #get initial conditions from the aircraft model        
+
+        # get initial conditions from the aircraft model
         self.load_model(model_name)
         self.fdm.set_dt(dt)
         # self.set_custom_initial_conditions(init_conditions)
 
         success = self.fdm.run_ic()
         if not success:
-            raise RuntimeError('JSBSim failed to initialise simulation conditions.')
+            raise RuntimeError(
+                'JSBSim failed to initialise simulation conditions.')
         # else:
         #     print('JSBSim successfully initialised')
 
@@ -191,7 +194,7 @@ class FlightDynamics:
         #     for prop, value in init_conditions.items():
         #         self[prop] = value
         if init_conditions is None:
-            for k,v in self.init_conditions.items():
+            for k, v in self.init_conditions.items():
                 self.fdm[k] = v
 
     def reinitialise(self, init_conditions: Dict['prp.Property', float] = None) -> None:
@@ -231,14 +234,15 @@ class FlightDynamics:
         """Converts local position (in meters) to 
         global position (degrees and meters for altitude).
         """
-        
+
         # Conversion factors
         meters_per_degree_latitude = 111320
         equatorial_circumference_meters = 40075000
-        
+
         x_meters, y_meters, z_meters = local_position
         lat_degrees = y_meters / meters_per_degree_latitude
-        lon_degrees = (x_meters / (equatorial_circumference_meters * math.cos(math.radians(lat_degrees)) / 360))
+        lon_degrees = (x_meters / (equatorial_circumference_meters *
+                       math.cos(math.radians(lat_degrees)) / 360))
         return [lon_degrees, lat_degrees, z_meters]
 
     def get_local_position(self) -> list:
@@ -250,19 +254,20 @@ class FlightDynamics:
         # x = 40075000 * self[prp.lng_geoc_deg] * math.cos(self[prp.lat_geod_deg] * \
         #     (math.pi / 180.0)) / 360
         # z = self[prp.altitude_sl_ft]
-                
+
         lat_degrees = self[prp.lat_geod_deg]
         lon_degrees = self[prp.lng_geoc_deg]
         alt_meters = feet_to_meters(self[prp.altitude_sl_ft])
         # lon_degrees, lat_degrees, alt_meters = geo_coords
         lat_meters = lat_degrees * 111320
-        lon_meters = (lon_degrees * (40075000 * math.cos(math.radians(lat_degrees)) / 360))
+        lon_meters = (lon_degrees * (40075000 *
+                      math.cos(math.radians(lat_degrees)) / 360))
 
         # if self.return_metric_units:
         #     y = feet_to_meters(y)
         #     x = feet_to_meters(x)
         #     z = feet_to_meters(z)
-        
+
         # position = [x, y, z]
         # return position
         return [lon_meters, lat_meters, alt_meters]
@@ -289,13 +294,13 @@ class FlightDynamics:
         pitch = self[prp.pitch_rad]
         # yaw = self[prp.heading_deg] * (math.pi / 180)
         yaw = self[prp.heading_rad]
-        #wrap yaw to -pi to pi
-        #yaw = (yaw + math.pi) % (2 * math.pi) - math.pi
+        # wrap yaw to -pi to pi
+        # yaw = (yaw + math.pi) % (2 * math.pi) - math.pi
         # yaw = self.fdm.get_property_value("attitude/heading-true-rad")
-        #self[prp.heading_rad]
+        # self[prp.heading_rad]
         orientation = [roll, pitch, yaw]
         return orientation
-    
+
     def get_states(self) -> AircraftState:
         """
         Gets the current state of the aircraft
@@ -307,19 +312,19 @@ class FlightDynamics:
         # v_ms = feet_to_meters(self[prp.v_fps])
         # w_ms = feet_to_meters(self[prp.w_fps])
         # mag_airspeed = math.sqrt(u_ms**2 + v_ms**2 + w_ms**2)
-        #wrap the yaw to -pi to pi
+        # wrap the yaw to -pi to pi
         orientation[2] = (orientation[2] + math.pi) % (2 * math.pi) - math.pi
-        
+
         states = AircraftState(
-            x = position[0],
-            y = position[1],
-            z = position[2],
-            roll = orientation[0],
-            pitch = orientation[1],
-            yaw = orientation[2],
+            x=position[0],
+            y=position[1],
+            z=position[2],
+            roll=orientation[0],
+            pitch=orientation[1],
+            yaw=orientation[2],
             airspeed=airspeed,
         )
-        
+
         return states
 
     # @staticmethod
@@ -394,7 +399,7 @@ class FlightDynamics:
 
         try:
             self[prp.throttle_1_cmd] = throttle_cmd
-            #self[prp.mixture_1_cmd] = mixture_cmd
+            # self[prp.mixture_1_cmd] = mixture_cmd
         except KeyError:
             pass  # must be single-control aircraft
 

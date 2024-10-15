@@ -2,7 +2,7 @@
 User defines
 
 Handle the JSBSIM first
- 
+
 """
 from typing import Optional
 import numpy as np
@@ -108,7 +108,7 @@ class AircraftSim():
 
     def __set_fidelity(self) -> None:
         """
-        Depending on what the user sets will 
+        Depending on what the user sets will
         set fidelity of simulator between using JSBSIM or kinematics
         """
         if self.fidelity_type == "JSBSIM":
@@ -148,11 +148,13 @@ class AircraftSim():
         TODO: refactor the ctrl type checker to be more efficient
         """
         if high_lvl_ctrl.ctrl_type == "attitude":
-            self.autopilot.roll_hold(high_lvl_ctrl.roll)
-            self.autopilot.pitch_hold(high_lvl_ctrl.pitch)
-            # self.autopilot.heading_hold(high_lvl_ctrl.yaw)
             self.autopilot.airspeed_hold_w_throttle(
-                meters_to_feet(high_lvl_ctrl.vel_cmd))
+                mps_to_ktas(high_lvl_ctrl.vel_cmd))
+            self.autopilot.roll_hold(high_lvl_ctrl.roll)
+            # self.autopilot.pitch_hold(high_lvl_ctrl.pitch)
+            self.autopilot.altitude_hold(high_lvl_ctrl.alt_ref_ft)
+            # self.autopilot.heading_hold(high_lvl_ctrl.yaw)
+
         elif high_lvl_ctrl.ctrl_type == "dz_heading_airspeed":
             # print("alt ref: ", high_lvl_ctrl.alt_ref_ft)
             # print("alt m: ", high_lvl_ctrl.alt_ref_m)
