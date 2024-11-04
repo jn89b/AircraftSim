@@ -26,7 +26,7 @@ class AircraftSim():
     def __init__(self, aircraft_name: str = None,
                  fidelity_type: Optional[int] = 0,
                  integration_type: Optional[int] = 1,
-                 sim_freq: Optional[float] = 200,
+                 sim_freq: Optional[int] = 200,
                  is_high_lvl_ctrl: Optional[bool] = True,
                  init_cond: AircraftIC = None,
                  low_control_lim: LowLevelControlLimits = None) -> None:
@@ -42,17 +42,17 @@ class AircraftSim():
 
         self.fidelity_type: str = self.fidelity_list[fidelity_type]
         self.integration_type: str = self.integration_list[integration_type]
-        self.sim_freq = sim_freq
-        self.dt = 1/self.sim_freq
-        self.is_high_lvl_ctrl = is_high_lvl_ctrl
-        self.init_cond = self.convert_ic_to_dict(init_cond)
+        self.sim_freq: int = sim_freq
+        self.dt: float = 1/self.sim_freq
+        self.is_high_lvl_ctrl: bool = is_high_lvl_ctrl
+        self.init_cond: AircraftIC = self.convert_ic_to_dict(init_cond)
 
         # self.low_control_lim:LowLevelControlLimits = low_control_lim
         self.__check_filled()
         self.__set_fidelity()
-        self.__set_integration()
-        self.report = self.__set_report()
-        self.wind_estimation = WindEstimation(self.sim)
+        # self.__set_integration()
+        self.report: SimResults = self.__set_report()
+        self.wind_estimation: WindEstimation = WindEstimation(self.sim)
 
     def convert_ic_to_dict(self, init_cond: AircraftIC) -> dict:
 
@@ -112,13 +112,13 @@ class AircraftSim():
         set fidelity of simulator between using JSBSIM or kinematics
         """
         if self.fidelity_type == "JSBSIM":
-            print("Using JSBSIM")
             self.sim = FlightDynamics(
                 sim_frequency_hz=self.sim_freq,
                 aircraft=self.aircraft,
                 init_conditions=self.init_cond,
                 return_metric_units=True,
                 debug_level=0)
+            self.sim.init_fdm()
             self.sim.start_engines()
             self.sim.set_throttle_mixture_controls(0.3, 0)
             self.autopilot = X8Autopilot(
@@ -134,7 +134,7 @@ class AircraftSim():
         if self.integration_type == "EULER":
             print("Using Euler Integration")
         elif self.integration_type == "RK4":
-            print("Using RK4 Integration")
+            pass
         else:
             raise ValueError("Integration type not defined \
                 you must specify EULER or RK4")
@@ -176,6 +176,7 @@ class AircraftSim():
                 target_easting=dy,
                 target_alt=dz
             )
+
         return
 
     def step(self, high_lvl_ctrl: HighControlInputs) -> None:
@@ -207,14 +208,15 @@ class AircraftSim():
 
     def reset_sim(self, init_cond: AircraftIC) -> None:
         if self.fidelity_type == "JSBSIM":
-            self.sim = None
             self.init_cond = self.convert_ic_to_dict(init_cond)
-            self.sim = FlightDynamics(
-                sim_frequency_hz=self.sim_freq,
-                aircraft=self.aircraft,
-                init_conditions=self.init_cond,
-                return_metric_units=True,
-                debug_level=0)
+            self.sim.reinitialise(self.init_cond)
+
+            # self.sim = FlightDynamics(
+            #     sim_frequency_hz=self.sim_freq,
+            #     aircraft=self.aircraft,
+            #     init_conditions=self.init_cond,
+            #     return_metric_units=True,
+            #     debug_level=0)
             self.sim.start_engines()
             self.sim.set_throttle_mixture_controls(0.3, 0)
             self.autopilot = X8Autopilot(

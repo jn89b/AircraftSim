@@ -6,8 +6,9 @@ Based on https://github.com/Gor-Ren/gym-jsbsim/blob/master/gym_jsbsim/aircraft.p
 Defines allowable aircraft types, this package is based around the x8 light UAV aircraft. 
 """
 
-class Aircraft(collections.namedtuple('Aircraft', ['jsbsim_id', 
-                                                   'name', 
+
+class Aircraft(collections.namedtuple('Aircraft', ['jsbsim_id',
+                                                   'name',
                                                    'cruise_speed_kts'])):
 
     KTS_TO_M_PER_S = 0.51444
@@ -26,4 +27,4 @@ cessna172P = Aircraft('c172p', 'Cessna172P', 95)
 x8 = Aircraft('x8', 'Skywalker x8', 20)
 ball = Aircraft('ball', 'a ball', 5)
 # f15 = Aircraft('f15', 'F15', 220)
-# a320 = Aircraft('A320', 'Airbus A320', 490)   
+# a320 = Aircraft('A320', 'Airbus A320', 490)

@@ -86,20 +86,18 @@ class FlightDynamics:
         # self.fdm = jsbsim.FGFDMExec(root_dir=self.ROOT_DIR)
         self.dir = self.set_root_dir()
         self.dir = os.path.join(self.dir, 'aircraft')
-        print("directory", self.dir)
-        # will need to map this to root
-        self.fdm = jsbsim.FGFDMExec(root_dir=self.dir)
-        # self.set_root_dir()
-        self.fdm.set_debug_level(debug_level)
+
         self.sim_frequency_hz = sim_frequency_hz
         self.sim_dt = 1.0 / sim_frequency_hz
         self.aircraft = aircraft
         self.init_conditions = init_conditions
         self.return_metric_units = return_metric_units
-        self.initialise(self.sim_dt, self.aircraft.jsbsim_id,
-                        self.init_conditions)
-        self.fdm.disable_output()
+
         self.wall_clock_dt = None
+        self.debug_level = debug_level
+        self.fdm = None
+        # if self.fdm is None:
+        #     self.init_fdm()
         # self.client = self.airsim_connect()
 
     def __getitem__(self, prop: Union[prp.BoundedProperty, prp.Property]) -> float:
@@ -107,6 +105,15 @@ class FlightDynamics:
 
     def __setitem__(self, prop: Union[prp.BoundedProperty, prp.Property], value) -> None:
         self.fdm[prop.name] = value
+
+    def init_fdm(self) -> None:
+        # will need to map this to root
+        self.fdm = jsbsim.FGFDMExec(root_dir=self.dir)
+        # self.set_root_dir()
+        self.initialise(self.sim_dt, self.aircraft.jsbsim_id,
+                        self.init_conditions)
+        self.fdm.disable_output()
+        self.fdm.set_debug_level(self.debug_level)
 
     def set_root_dir(self) -> str:
         # get engine path
@@ -205,6 +212,9 @@ class FlightDynamics:
         by default this is the original initialization file
         :return: None
         """
+        if self.fdm is None:
+            self.init_fdm()
+
         self.set_custom_initial_conditions(init_conditions=init_conditions)
         no_output_reset_mode = 0
         self.fdm.reset_to_initial_conditions(no_output_reset_mode)

@@ -123,10 +123,13 @@ class HighControlInputs():
                 raise ValueError("Velocity command is None")
             return
 
-# @dataclass
-# class LowLevelControlInputs():
-#     def __init__(self) -> None:
-#         pass
+    def __str__(self):
+        return f"HighControlInputs(ctrl_idx={self.ctrl_idx}, \
+            ctrl_type={self.ctrl_type}, \
+            alt_ref_m={self.alt_ref_m}, \
+            heading_ref_deg={self.heading_ref_deg}, \
+            roll={self.roll}, pitch={self.pitch}, \
+            yaw={self.yaw}, vel_cmd={self.vel_cmd})"
 
 
 @dataclass
@@ -138,14 +141,6 @@ class AircraftState():
     pitch: float
     yaw: float
     airspeed: float
-    # def __init__() -> None:
-    # self.x:float = x
-    # self.y:float = y
-    # self.z:float = z
-    # self.roll:float = roll
-    # self.pitch:float = pitch
-    # self.yaw:float = yaw
-    # self.airspeed:float = airspeed
 
 
 @dataclass

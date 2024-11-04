@@ -98,6 +98,7 @@ goal_x = -50
 goal_y = 150
 
 for i in range(N):
+    goal_x += 5
 
     los = compute_los(goal_x, goal_y, sim)
     # los = np.pi/2 - los
@@ -117,18 +118,18 @@ for i in range(N):
         error = error - 2*np.pi
     elif error < -np.pi:
         error = error + 2*np.pi
-    roll = np.arctan2(error*20, -9.81)
+    roll = np.arctan2(error, -9.81)
     roll = np.clip(roll, -np.deg2rad(35), np.deg2rad(35))
 
-    print("Roll: ", np.rad2deg(roll))
-    high_lvl_ctrl = HighControlInputs(
-        ctrl_idx=0,
-        roll=roll,
-        pitch=np.deg2rad(-10.0),
-        alt_ref_m=50,
-        yaw=0,
-        vel_cmd=20
-    )
+    # print("Roll: ", np.rad2deg(roll))
+    # high_lvl_ctrl = HighControlInputs(
+    #     ctrl_idx=0,
+    #     roll=roll,
+    #     pitch=np.deg2rad(-10.0),
+    #     alt_ref_m=50,
+    #     yaw=0,
+    #     vel_cmd=20
+    # )
 
     sim.step(high_lvl_ctrl=high_lvl_ctrl)
 

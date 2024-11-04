@@ -119,12 +119,11 @@ classifiers = [
 # For an analysis of this field vs pip's requirements files see:
 # https://packaging.python.org/discussions/install-requires-vs-requirements/
 dependencies = [
-    "auto_mix_prep>=0.2.0",
-    "casadi>=3.6.7",
+    "auto_mix_prep",
     "controls>=0.10.1",
     "JSBSim>=1.2.1",
     "matplotlib>=3.9.2",
-    "numpy>=2.1.2",
+    "numpy>=2.0",
     "scipy>=1.14.1",
     "setuptools>=59.6.0",
     "Shapely>=2.0.6",
