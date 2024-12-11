@@ -191,6 +191,10 @@ class SimResults():
         self.y: List[float] = []
         self.z: List[float] = []
 
+        self.vx: List[float] = []
+        self.vy: List[float] = []
+        self.vz: List[float] = []
+
     def collect_data(self, aircraft_state: AircraftState) -> None:
         self.time.append(self.sim.get_time())
         self.lat_m.append(self.sim.get_local_position()[0])
@@ -217,6 +221,9 @@ class SimResults():
         self.x.append(aircraft_state.x)
         self.y.append(aircraft_state.y)
         self.z.append(aircraft_state.z)
+        # self.vx.append(aircraft_state.vx)
+        # self.vy.append(aircraft_state.vy)
+        # self.vz.append(aircraft_state.vz)
 
         return None
 
@@ -228,12 +235,20 @@ class DataVisualizer():
 
     def plot_3d_trajectory(self, start_time: float = None,
                            end_time: float = None,
-                           color: str = 'blue') -> Tuple[plt.Figure, plt.Axes]:
+                           color: str = 'blue',
+                           swap_xy: bool = True) -> Tuple[plt.Figure, plt.Axes]:
 
         if start_time is None:
             start_time = 0
         if end_time is None:
             end_time = self.report.time[-1]
+
+        if swap_xy:
+            x = self.report.y
+            y = self.report.x
+
+            self.report.x = x
+            self.report.y = y
 
         # fig, ax = plt.subplots()
         # ax = fig.add_subplot(111, projection='3d')
