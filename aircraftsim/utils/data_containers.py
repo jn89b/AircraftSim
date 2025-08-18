@@ -32,7 +32,6 @@ class AircraftStateLimits():
         self.yaw_bounds: List[float] = yaw_bounds
         self.airspeed_bounds: List[float] = airspeed_bounds
 
-
 @dataclass
 class HighLevelControlLimits():
     """
@@ -72,7 +71,6 @@ class HighControlInputs():
     1: alt_ref_ft, heading_ref_deg, airspeed_ref_kts, vel_cmd
 
     If incorrect control type is specified, an error will be raised
-
     """
 
     def __init__(self,

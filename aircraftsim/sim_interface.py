@@ -86,6 +86,23 @@ class AircraftSim():
 
         return init_cond_dict
 
+    def get_local_orientation(self) -> list:
+        """
+        Get the orientation of the vehicle
+
+        :return: orientation [pitch, roll, yaw]
+        # """
+        roll = self[prp.roll_rad]
+        pitch = self[prp.pitch_rad]
+        # yaw = self[prp.heading_deg] * (math.pi / 180)
+        yaw = self[prp.heading_rad]
+        # wrap yaw to -pi to pi
+        # yaw = (yaw + math.pi) % (2 * math.pi) - math.pi
+        # yaw = self.fdm.get_property_value("attitude/heading-true-rad")
+        # self[prp.heading_rad]
+        orientation = [roll, pitch, yaw]
+        return orientation
+
     def __check_filled(self) -> None:
         # if self.state_lim is None:
         #     raise ValueError("State limits not defined")
@@ -191,11 +208,11 @@ class AircraftSim():
             raise ValueError("High level control inputs are incorrect\
                 please check the control type which was set to: {}".format(
                 high_lvl_ctrl.ctrl_type))
-
+            
         self.__set_autopilot_ref(high_lvl_ctrl)
         if self.fidelity_type == "JSBSIM":
             self.sim.run()
-            aircraft_state: AircraftState = self.sim.get_states()
+            aircraft_state: AircraftState = self.get_states()
             self.report.collect_data(aircraft_state)
 
     def close_sim(self) -> None:
@@ -211,12 +228,6 @@ class AircraftSim():
             self.init_cond = self.convert_ic_to_dict(init_cond)
             self.sim.reinitialise(self.init_cond)
 
-            # self.sim = FlightDynamics(
-            #     sim_frequency_hz=self.sim_freq,
-            #     aircraft=self.aircraft,
-            #     init_conditions=self.init_cond,
-            #     return_metric_units=True,
-            #     debug_level=0)
             self.sim.start_engines()
             self.sim.set_throttle_mixture_controls(0.3, 0)
             self.autopilot = X8Autopilot(

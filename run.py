@@ -34,7 +34,6 @@ To do write the equations of motion right here and see if it matches
 with the actual trajectory after running the simulation
 """
 
-
 state_limits = AircraftStateLimits(
     x_bounds=[-100, 100],
     y_bounds=[-100, 100],
@@ -54,7 +53,7 @@ init_cond = AircraftIC(
     x=0, y=0, z=50,
     roll=np.deg2rad(0),
     pitch=np.deg2rad(0),
-    yaw=np.deg2rad(0),
+    yaw=np.deg2rad(30),
     airspeed_m=20)
 
 sim = SimInterface(
@@ -67,16 +66,8 @@ N = 8000
 high_lvl_ctrl = HighControlInputs(
     ctrl_idx=1,
     alt_ref_m=50,
-    heading_ref_deg=20,
+    heading_ref_deg=90,
     vel_cmd=20,
-)
-
-high_lvl_ctrl = HighControlInputs(
-    ctrl_idx=0,
-    roll=0,
-    pitch=0,
-    yaw=0,
-    vel_cmd=20
 )
 
 # create a sinusoid for heading ref deg
@@ -84,8 +75,10 @@ heading_ref_deg = 40*np.sin(np.linspace(0, 2*np.pi, N))
 total_time = N/sim.sim_freq
 print("Total time: ", total_time)
 
-
 def compute_los(goal_x: float, goal_y: float, sim: SimInterface):
+    """
+    Line of sight should be computed in North East Down (NED) coordinates
+    """
     current_state: AircraftState = sim.get_states()
     dy = goal_x - current_state.x
     dx = goal_y - current_state.y
@@ -93,22 +86,13 @@ def compute_los(goal_x: float, goal_y: float, sim: SimInterface):
 
     return los
 
-
-goal_x = -50
-goal_y = 150
+goal_x = 50
+goal_y = -150
 
 for i in range(N):
-    goal_x += 5
-
+    # goal_x += 5
     los = compute_los(goal_x, goal_y, sim)
-    # los = np.pi/2 - los
-    # los_dg = np.rad2deg(los)
-    # high_lvl_ctrl = HighControlInputs(
-    #     ctrl_idx=1,
-    #     alt_ref_m=50,
-    #     heading_ref_deg=los_dg,
-    #     vel_cmd=15,
-    # )
+    
     # can I map the los to the roll?
     current_yaw = sim.get_states().yaw
     error = los - current_yaw
@@ -120,23 +104,28 @@ for i in range(N):
         error = error + 2*np.pi
     roll = np.arctan2(error, -9.81)
     roll = np.clip(roll, -np.deg2rad(35), np.deg2rad(35))
-
-    # print("Roll: ", np.rad2deg(roll))
-    # high_lvl_ctrl = HighControlInputs(
-    #     ctrl_idx=0,
-    #     roll=roll,
-    #     pitch=np.deg2rad(-10.0),
-    #     alt_ref_m=50,
-    #     yaw=0,
-    #     vel_cmd=20
-    # )
-
+    
+    if i > N/2 == 0:
+        vel_cmd = 10
+    else:
+        vel_cmd = 20
+        
+    high_lvl_ctrl = HighControlInputs(
+        ctrl_idx=1,
+        heading_ref_deg=np.rad2deg(los),
+        pitch=np.deg2rad(-10.0),
+        alt_ref_m=50,
+        yaw=90,
+        vel_cmd=vel_cmd
+    )    
     sim.step(high_lvl_ctrl=high_lvl_ctrl)
-
+    print("Current state: ", sim.get_states())
+    
 report = sim.report
 data_vis = DataVisualizer(report)
 fig, ax = data_vis.plot_3d_trajectory()
-ax.scatter(goal_x, goal_y, 50)
+ax.scatter(goal_y, goal_x, 50, color='red', label='Goal')
+# ax.scatter
 fig1, ax1 = data_vis.plot_attitudes()
 fig2, ax2 = data_vis.plot_airspeed()
 # save figure
