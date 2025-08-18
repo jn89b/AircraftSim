@@ -60,23 +60,14 @@
   <!-- Mirror the x8 style: reference an engine file and a simple thruster.
        Create Tools/autotest/aircraft/Engines/electric3000W.xml (or reuse electric800W.xml). -->
   <propulsion>
-    <!-- DA-35 piston engine (external file above) -->
-    <engine file="DA35_piston.xml">
-      <!-- location/orient are inside engine file, but you may override here if desired -->
-      <thruster file="propeller">
-        <!-- Simple prop model: start with diameter & efficiency; refine later with J-curve if needed -->
-        <diameter unit="M">0.508</diameter>    <!-- 20 inch two-blade -->
-        <numblades>2</numblades>
-        <inertia unit="KG*M2">0.010</inertia>  <!-- guess; tune with spin-up/spin-down logs -->
-        <efficiency>0.78</efficiency>          <!-- start here; tune with level-flight throttle -->
-        <pitch unit="M">0.203</pitch>          <!-- ~8 in; rough helical pitch for first pass -->
-        <sense>1</sense>
+    <engine file="DA35.xml">
+      <thruster file="prop20x8_CTCP.xml">
         <location unit="M"><x>0.60</x><y>0.00</y><z>0.00</z></location>
         <orient unit="DEG"><roll>0</roll><pitch>0</pitch><yaw>0</yaw></orient>
       </thruster>
     </engine>
   </propulsion>
-  
+
   <!-- ========== SIMPLE NAV SENSOR (like your example) ========== -->
   <system name="Navigation">
     <channel name="Heading">
