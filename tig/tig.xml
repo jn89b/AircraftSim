@@ -1,0 +1,284 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="http://jsbsim.sourceforge.net/JSBSim.xsl"?>
+<fdm_config name="Tiguar C" version="2.0" release="ALPHA"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="http://jsbsim.sourceforge.net/JSBSim.xsd">
+
+  <fileheader>
+    <author>Justin / JSBSim seed model for Tiguar C</author>
+    <license licenseName="GPL (General Public License)" licenseURL="http://www.gnu.org/licenses/gpl.html"/>
+    <note>
+      First-cut airframe based on public specs and standard small-UAV priors. Educational use; not endorsed by the manufacturer.
+      Tune aero (CD0,K, CLmax), prop power, and inertias with flight data.
+    </note>
+    <filecreationdate>2025-08-18</filecreationdate>
+    <version>$Revision: 0.1$</version>
+    <description>Flight Dynamic Model of a Tiguar C UAV (seed, ArduPilot+JSBSim SITL)</description>
+  </fileheader>
+
+  <!-- ========== GEOMETRY / METRICS ========== -->
+  <metrics>
+    <wingarea unit="M2">1.38</wingarea>         <!-- from Vs~50 km/h with CLmax~1.5 -->
+    <wingspan unit="M">4.10</wingspan>
+    <chord unit="M">0.337</chord>               <!-- S/b -->
+    <location name="AERORP" unit="M"><x>0.00</x><y>0.00</y><z>0.00</z></location>
+    <location name="EYEPOINT" unit="M"><x>0.20</x><y>0.00</y><z>0.00</z></location>
+    <location name="VRP" unit="M"><x>0.20</x><y>0.00</y><z>0.00</z></location>
+  </metrics>
+
+  <!-- ========== MASS & INERTIA ========== -->
+  <mass_balance>
+    <ixx unit="KG*M2">4.5</ixx>
+    <iyy unit="KG*M2">8.0</iyy>
+    <izz unit="KG*M2">9.0</izz>
+    <ixz unit="KG*M2">0.0</ixz>
+    <emptywt unit="KG">14.0</emptywt>
+    <location name="CG" unit="M"><x>0.02</x><y>0.00</y><z>0.00</z></location>
+
+    <!-- Example payload block; adjust x for your CG -->
+    <pointmass name="payload">
+      <weight unit="KG">11.0</weight>
+      <location unit="M"><x>0.10</x><y>0.00</y><z>0.00</z></location>
+    </pointmass>
+  </mass_balance>
+
+  <!-- ========== GROUND (belly/skid by default) ========== -->
+  <ground_reactions>
+    <!-- Uncomment/adjust if you want gear contacts; belly skid is fine for SITL -->
+    <!--
+    <contact type="STRUCTURE" name="Belly">
+      <location unit="M"><x>0.0</x><y>0.0</y><z>-0.25</z></location>
+      <static_friction>0.9</static_friction>
+      <dynamic_friction>0.7</dynamic_friction>
+      <spring_coeff unit="N/M">80000</spring_coeff>
+      <damping_coeff unit="N/M/S">9000</damping_coeff>
+    </contact>
+    -->
+  </ground_reactions>
+
+  <!-- ========== PROPULSION ========== -->
+  <!-- Mirror the x8 style: reference an engine file and a simple thruster.
+       Create Tools/autotest/aircraft/Engines/electric3000W.xml (or reuse electric800W.xml). -->
+  <propulsion>
+    <!-- DA-35 piston engine (external file above) -->
+    <engine file="DA35_piston.xml">
+      <!-- location/orient are inside engine file, but you may override here if desired -->
+      <thruster file="propeller">
+        <!-- Simple prop model: start with diameter & efficiency; refine later with J-curve if needed -->
+        <diameter unit="M">0.508</diameter>    <!-- 20 inch two-blade -->
+        <numblades>2</numblades>
+        <inertia unit="KG*M2">0.010</inertia>  <!-- guess; tune with spin-up/spin-down logs -->
+        <efficiency>0.78</efficiency>          <!-- start here; tune with level-flight throttle -->
+        <pitch unit="M">0.203</pitch>          <!-- ~8 in; rough helical pitch for first pass -->
+        <sense>1</sense>
+        <location unit="M"><x>0.60</x><y>0.00</y><z>0.00</z></location>
+        <orient unit="DEG"><roll>0</roll><pitch>0</pitch><yaw>0</yaw></orient>
+      </thruster>
+    </engine>
+  </propulsion>
+  
+  <!-- ========== SIMPLE NAV SENSOR (like your example) ========== -->
+  <system name="Navigation">
+    <channel name="Heading">
+      <sensor name="navigation/actual-heading-rad">
+        <input>attitude/heading-true-rad</input>
+        <bias>0.0</bias>
+      </sensor>
+    </channel>
+  </system>
+
+  <!-- ========== FLIGHT CONTROLS (match X8 style mapping) ========== -->
+  <flight_control name="tiguar_c_fcs">
+
+    <!-- Pitch / Elevator -->
+    <channel name="Pitch">
+      <summer name="fcs/pitch-sum">
+        <input>fcs/elevator-cmd-norm</input>
+        <clipto><min>-1</min><max>1</max></clipto>
+      </summer>
+      <aerosurface_scale name="fcs/elevator-control">
+        <input>fcs/pitch-sum</input>
+        <range><min>-20</min><max>20</max></range>      <!-- deg -->
+        <gain>0.0174533</gain>                          <!-- deg->rad -->
+      </aerosurface_scale>
+      <actuator name="fcs/elevator-actuator">
+        <input>fcs/elevator-control</input>
+        <!-- Add rate limit if you want to match servos:
+             <rate_limit>2.5</rate_limit>  -->
+        <clipto><min>-0.35</min><max>0.35</max></clipto> <!-- +/-20 deg -->
+        <output>fcs/elevator-pos-rad</output>
+      </actuator>
+    </channel>
+
+    <!-- Roll / Ailerons -->
+    <channel name="Roll">
+      <summer name="fcs/roll-sum">
+        <input>fcs/aileron-cmd-norm</input>
+        <clipto><min>-1</min><max>1</max></clipto>
+      </summer>
+
+      <aerosurface_scale name="fcs/left-aileron-control">
+        <input>fcs/roll-sum</input>
+        <range><min>-20</min><max>20</max></range>
+        <gain>0.0174533</gain>
+      </aerosurface_scale>
+      <actuator name="fcs/left-aileron-actuator">
+        <input>fcs/left-aileron-control</input>
+        <output>fcs/left-aileron-pos-rad</output>
+      </actuator>
+
+      <aerosurface_scale name="fcs/right-aileron-control">
+        <input>fcs/roll-sum</input>
+        <range><min>-20</min><max>20</max></range>
+        <gain>0.0174533</gain>
+      </aerosurface_scale>
+      <actuator name="fcs/right-aileron-actuator">
+        <input>fcs/right-aileron-control</input>
+        <output>fcs/right-aileron-pos-rad</output>
+      </actuator>
+
+      <summer name="fcs/effective-aileron-pos">
+        <input>fcs/left-aileron-pos-rad</input>
+        <input>fcs/right-aileron-pos-rad</input>
+        <gain>0.5</gain>
+      </summer>
+    </channel>
+
+    <!-- Yaw / Rudder -->
+    <channel name="Yaw">
+      <summer name="fcs/yaw-sum">
+        <input>fcs/rudder-cmd-norm</input>
+        <clipto><min>-1</min><max>1</max></clipto>
+      </summer>
+      <aerosurface_scale name="fcs/rudder-control">
+        <input>fcs/yaw-sum</input>
+        <range><min>-25</min><max>25</max></range>
+        <gain>0.0174533</gain>
+      </aerosurface_scale>
+      <actuator name="fcs/rudder-actuator">
+        <input>fcs/rudder-control</input>
+        <clipto><min>-0.436</min><max>0.436</max></clipto> <!-- +/-25 deg -->
+        <output>fcs/rudder-pos-rad</output>
+      </actuator>
+    </channel>
+
+    <!-- Throttle (0..1) passes through -->
+    <channel name="Throttle">
+      <summer name="fcs/throttle-sum">
+        <input>fcs/throttle-cmd-norm</input>
+        <clipto><min>0.0</min><max>1.0</max></clipto>
+      </summer>
+      <actuator name="fcs/throttle-actuator">
+        <input>fcs/throttle-sum</input>
+        <output>propulsion/engine[0]/set-throttle</output>
+      </actuator>
+    </channel>
+
+  </flight_control>
+
+  <!-- ========== AERODYNAMICS (coefficient-style, clean & tunable) ========== -->
+  <aerodynamics>
+
+    <!-- LIFT -->
+    <axis name="LIFT">
+      <function name="CL0"><value>0.20</value></function>
+      <function name="CLalpha">
+        <product><value>5.1</value><property>aero/alpha-rad</property></product>
+      </function>
+      <function name="CLq">
+        <product><value>3.5</value><property>aero/ci2vel</property><property>velocities/q-aero-rad_sec</property></product>
+      </function>
+      <function name="CLde">
+        <product><value>0.50</value><property>fcs/elevator-pos-rad</property></product>
+      </function>
+    </axis>
+
+    <!-- DRAG -->
+    <!-- Parasitic + induced: CD = CD0 + K*CL^2 + small control drag -->
+    <axis name="DRAG">
+      <function name="CD0"><value>0.030</value></function>
+      <function name="CDi">
+        <product>
+          <value>0.0327</value>
+          <square>
+            <sum><property>forces/CL</property></sum>
+          </square>
+        </product>
+      </function>
+      <function name="CDde">
+        <product><value>0.02</value><abs><property>fcs/elevator-pos-rad</property></abs></product>
+      </function>
+    </axis>
+
+    <!-- SIDE FORCE -->
+    <axis name="SIDE">
+      <function name="CYb">
+        <product><value>-0.90</value><property>aero/beta-rad</property></product>
+      </function>
+      <function name="CYp">
+        <product><value>-0.10</value><property>aero/bi2vel</property><property>velocities/p-aero-rad_sec</property></product>
+      </function>
+      <function name="CYr">
+        <product><value>0.15</value><property>aero/bi2vel</property><property>velocities/r-aero-rad_sec</property></product>
+      </function>
+      <function name="CYdr">
+        <product><value>0.20</value><property>fcs/rudder-pos-rad</property></product>
+      </function>
+    </axis>
+
+    <!-- ROLL MOMENT -->
+    <axis name="ROLL">
+      <function name="Clb">
+        <product><value>-0.08</value><property>aero/beta-rad</property></product>
+      </function>
+      <function name="Clp">
+        <product><value>-0.50</value><property>aero/bi2vel</property><property>velocities/p-aero-rad_sec</property></product>
+      </function>
+      <function name="Clr">
+        <product><value>0.10</value><property>aero/bi2vel</property><property>velocities/r-aero-rad_sec</property></product>
+      </function>
+      <function name="Clda">
+        <product><value>0.08</value><property>fcs/effective-aileron-pos</property></product>
+      </function>
+    </axis>
+
+    <!-- PITCH MOMENT -->
+    <axis name="PITCH">
+      <function name="Cm0"><value>-0.02</value></function>
+      <function name="Cmalpha">
+        <product><value>-0.60</value><property>aero/alpha-rad</property></product>
+      </function>
+      <function name="Cmq">
+        <product><value>-8.0</value><property>aero/ci2vel</property><property>velocities/q-aero-rad_sec</property></product>
+      </function>
+      <function name="Cmde">
+        <product><value>-1.10</value><property>fcs/elevator-pos-rad</property></product>
+      </function>
+    </axis>
+
+    <!-- YAW MOMENT -->
+    <axis name="YAW">
+      <function name="Cnb">
+        <product><value>0.10</value><property>aero/beta-rad</property></product>
+      </function>
+      <function name="Cnp">
+        <product><value>-0.06</value><property>aero/bi2vel</property><property>velocities/p-aero-rad_sec</property></product>
+      </function>
+      <function name="Cnr">
+        <product><value>-0.20</value><property>aero/bi2vel</property><property>velocities/r-aero-rad_sec</property></product>
+      </function>
+      <function name="Cndr">
+        <product><value>-0.12</value><property>fcs/rudder-pos-rad</property></product>
+      </function>
+    </axis>
+
+  </aerodynamics>
+
+  <!-- Optional CSV for quick debugging
+  <output name="JSBout_Tiguar.csv" type="CSV" rate="25">
+    <rates>ON</rates><velocities>ON</velocities><position>ON</position>
+    <fcs>ON</fcs><propulsion>ON</propulsion><simulation>ON</simulation>
+  </output>
+  -->
+
+</fdm_config>
