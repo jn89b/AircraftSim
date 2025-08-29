@@ -38,11 +38,11 @@
 
     <mass_balance>
         <ixx unit="KG*M2">5.0</ixx>
-        <iyy unit="KG*M2">3.5</iyy>
+        <iyy unit="KG*M2">4.5</iyy>
         <izz unit="KG*M2">4.8</izz>
-        <emptywt unit="KG"> 23 </emptywt>
+        <emptywt unit="KG"> 10 </emptywt>
         <location name="CG" unit="IN">
-            <x> 35 </x>
+            <x> 34 </x>
             <y> 0 </y>
             <z> 4 </z>
         </location>
@@ -88,11 +88,10 @@
       </contact>
     </ground_reactions>
 
-
     <propulsion>
-        <engine file="Zenoah_G-26A">
+        <engine file="DA35_electric">
             <location unit="IN">
-                <x> 36 </x>
+                <x> 38 </x>
                 <y> 0 </y>
                 <z> 0 </z>
             </location>
@@ -102,9 +101,9 @@
                 <yaw> 0 </yaw>
             </orient>
             <feed>0</feed>
-            <thruster file="18x8">
+            <thruster file="20x10">
                 <location unit="IN">
-                    <x> 1 </x>
+                    <x> 38 </x>
                     <y> 0 </y>
                     <z> 0 </z>
                 </location>
@@ -116,15 +115,6 @@
                 <p_factor>1.0</p_factor>
             </thruster>
         </engine>
-        <tank type="FUEL">    <!-- Tank number 0 -->
-            <location unit="IN">
-                <x> 36.36 </x>
-                <y> 0 </y>
-                <z> -1.89375 </z>
-            </location>
-            <capacity unit="LBS"> 1.5 </capacity>
-            <contents unit="LBS"> 1.5 </contents>
-        </tank>
     </propulsion>
 
     <flight_control name="FCS: tig">
